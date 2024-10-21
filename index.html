@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+            <title></title>
+
+        <!--put your external stylesheet links here-->
+        <!--[if IE<9]>
+            <link rel="stylesheet" href="css/style.ie.css">
+        <![endif]-->
+
+         <!--you can also place internal styles here;
+             place these within <style> tags-->
+        <!-- Load Leaflet from CDN -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+        <link rel="stylesheet" href="css/style.css"/>
+
+        <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+        <script src="https://js.arcgis.com/4.28/"></script>
+        
+    </head>
+
+    
+    <body>
+        <div id="viewDiv"></div>
+
+        <div id="sidebar">
+            <h2>Features</h2>
+            <div id="locationList">
+                <!-- Feature items will be populated here dynamically -->
+            </div>
+        </div>
+    
+        <script type="text/javascript" src="js/main.js"></script>
+    </body>
+</html>
