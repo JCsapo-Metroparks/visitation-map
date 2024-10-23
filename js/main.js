@@ -3,47 +3,77 @@ function loadMap() {
 		"esri/Map",
 		"esri/views/MapView",
 		"esri/layers/FeatureLayer",
-		"esri/Graphic"
-	], function(Map, MapView, FeatureLayer, Graphic) {
+		"esri/Graphic",
+		"esri/widgets/Zoom"
+	], function(Map, MapView, FeatureLayer, Graphic, Zoom) {
 
 		// Create the map and view
 		var map = new Map({
-			basemap: "terrain"
+			basemap: "dark-gray"
 		});
 
 		var view = new MapView({
 			container: "viewDiv",
 			map: map,
-			zoom: 15,
-			center: [-81.6396800, 41.4175500] // Cleveland Metroparks coordinates
+			zoom: 9,
+			center: [-83.372261, 42.373177] 
 		});
 
+		view.ui.remove("zoom");
+
+		var zoomWidget = new Zoom({
+			view: view
+		});
+
+		view.ui.add(zoomWidget, {
+			position: "bottom-left"
+		});
+		
+		// Create park renderer for styling
+		var parkRenderer = {
+			"type": "simple",
+			"symbol": {
+				"type": "simple-fill",
+				"color": "RGB(138, 240, 151)",
+				"style": "solid"	
+			}
+		}
 		// Add a feature layer
-		var featureLayer = new FeatureLayer({
-			url: "https://services.arcgis.com/W8lmhbiyq5nrZIV6/arcgis/rest/services/Huron_Clinton_Metroparks/FeatureServer"
+		var parkLayer = new FeatureLayer({
+			url: "https://services.arcgis.com/W8lmhbiyq5nrZIV6/arcgis/rest/services/Huron_Clinton_Metroparks/FeatureServer", 
+			renderer: parkRenderer
 		});
-		map.add(featureLayer);
+		map.add(parkLayer);
 
-		// List of locations for sidebar (mock data)
-		var locations = [
-			{ name: "Attraction A", lat: 41.419, lng: -81.639 },
-			{ name: "Attraction B", lat: 41.415, lng: -81.637 },
-			{ name: "Attraction C", lat: 41.420, lng: -81.640 }
-		];
-
-		// Function to add items to sidebar
-		function populateSidebar(locations) {
+		 // Query the features from the FeatureLayer and populate the sidebar
+		function queryFeaturesAndPopulateSidebar() {
+			parkLayer.queryFeatures({
+				where: "1=1",  
+				outFields: "name",  
+				returnGeometry: true  
+			}).then(function(response) {
+				var features = response.features;
+				console.log(response)
+				populateSidebar(features);
+			}).catch(function(error) {
+				console.error("Query failed: ", error);
+			});
+		}
+		
+		function populateSidebar(features) {
 			var locationList = document.getElementById("locationList");
-			locations.forEach(function(location) {
+			locationList.innerHTML = "";  // Clear previous content
+
+			features.forEach(function(feature) {
 				var locationItem = document.createElement("div");
 				locationItem.classList.add("location-item");
-				locationItem.innerHTML = location.name;
+				locationItem.innerHTML = feature.attributes.name;  // Display the feature's name
 
-				// Add click event to zoom into feature
+				// Add click event to zoom into the feature
 				locationItem.addEventListener("click", function() {
 					view.goTo({
-						center: [location.lng, location.lat],
-						zoom: 17
+						target: feature.geometry,
+						zoom: 12.5
 					});
 				});
 
@@ -52,7 +82,7 @@ function loadMap() {
 		}
 
 		// Populate the sidebar with locations
-		populateSidebar(locations);
+		queryFeaturesAndPopulateSidebar() 
 	});
 };
 
